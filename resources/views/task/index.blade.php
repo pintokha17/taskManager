@@ -15,6 +15,7 @@
                 </tr>
             </thead>
             <tbody>
+				
             @foreach($tasks as $task)
                 <tr>
                     <th scope="row">{{ $task->id }}</th>
@@ -41,6 +42,7 @@
                     </td>
                 </tr>
             @endforeach
+		
             </tbody>
         </table>
     </div>

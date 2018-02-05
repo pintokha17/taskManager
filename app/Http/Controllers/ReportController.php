@@ -6,6 +6,7 @@ use App\Task;
 use Illuminate\Http\Request;
 use App\TaskTime;
 use DB;
+use Auth;
 
 class ReportController extends Controller
 {
@@ -16,7 +17,7 @@ class ReportController extends Controller
         {
             $dateFrom = new \DateTime($request->get('date_from'));
             $dateTo = new \DateTime($request->get('date_to'));
-            $dateTo->modify('1 day');
+            $dateTo->modify('+1 day');
 
             if ($dateFrom->getTimestamp() > $dateTo->getTimestamp())
             {
@@ -28,7 +29,8 @@ class ReportController extends Controller
                 ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
                 ->where([
                     ['task_time.start', '>=', $dateFrom->getTimestamp()],
-                    ['task_time.pause', '<=', $dateTo->getTimestamp()]
+                    ['task_time.pause', '<=', $dateTo->getTimestamp()],
+					['tasks.user_id', '=', Auth::id()]
                 ])
                 ->leftJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
                 ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
@@ -36,6 +38,9 @@ class ReportController extends Controller
         } else { //searching all the records from table
             $tasks = DB::table('tasks')
                 ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
+				->where([
+					['tasks.user_id', '=', Auth::id()]
+                ])
                 ->leftJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
                 ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
                 ->get();

@@ -17,6 +17,7 @@ class TaskController extends Controller
     {
         $tasks = DB::table('tasks')
             ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
+			->where('tasks.user_id', '=', Auth::id())
             ->leftJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
             ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
             ->get();

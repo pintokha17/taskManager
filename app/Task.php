@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Khill\Duration\Duration;
 use Auth;
-use App\TaskTime;
 
 /**
  * App\Task
@@ -30,7 +29,7 @@ class Task extends Model
 
     public function time()
     {
-        return $this->belongsTo('App\TaskTime');
+        return $this->hasMany('App\TaskTime');
     }
 
     public function start()

@@ -19,7 +19,7 @@ class TaskTime extends Model
 
     public function task()
     {
-        return $this->hasMany(Task::class);
+        return $this->belongsTo('App\TaskTime');
     }
 
     public static function boot()
@@ -37,7 +37,7 @@ class TaskTime extends Model
      */
     public static function getActiveTaskTime($id)
     {
-        return self::where(['user_id' => Auth::id(), 'task_id' => $id, 'is_active' => '1'])->first();
+        return self::where(['task_id' => $id, 'is_active' => '1'])->first();
     }
 
     public function run($id)
@@ -47,7 +47,6 @@ class TaskTime extends Model
         $task->pause = 0;
         $task->is_active = 1;
         $task->task_id = $id;
-        $task->user_id = Auth::id();
         $task->save();
     }
 

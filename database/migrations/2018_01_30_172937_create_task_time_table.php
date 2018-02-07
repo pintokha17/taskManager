@@ -20,7 +20,6 @@ class CreateTaskTimeTable extends Migration
             $table->integer('execution_time')->default(0);
             $table->smallInteger('is_active');
             $table->integer('task_id');
-            $table->integer('user_id');
             $table->timestamps();
         });
     }

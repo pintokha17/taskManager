@@ -2,9 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Khill\Duration\Duration;
 use Auth;
+use App\TaskTime;
 
 /**
  * App\Task
@@ -19,13 +20,18 @@ use Auth;
  * @property integer is_active
  * @property integer user_id
  */
-class Task extends \Eloquent
+class Task extends Model
 {
     protected $table = 'tasks';
 
     const STATUS_STARTED = 'started';
     const STATUS_PAUSE = 'pause';
     const STATUS_COMPLETED = 'completed';
+
+    public function time()
+    {
+        return $this->belongsTo('App\TaskTime');
+    }
 
     public function start()
     {

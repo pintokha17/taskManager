@@ -17,6 +17,11 @@ class TaskTime extends Model
 {
     protected $table = 'task_time';
 
+    public function task()
+    {
+        return $this->hasMany(Task::class);
+    }
+
     public static function boot()
     {
         parent::boot();

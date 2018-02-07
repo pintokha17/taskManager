@@ -8,22 +8,18 @@
                     {{ session('error') }}
                 </div>
             @endif
-            <?php
-                $selectedDateFrom = Request::isMethod('POST') ? Request::get('date_from') : date("Y-m-d");
-                $selectedDateTo = Request::isMethod('POST') ? Request::get('date_to') : date("Y-m-d");
-                ?>
 
             {!! Form::open(['url' => route('report'), 'class' => 'form-horizontal', 'method' => 'post'])!!}
             <div class="form-group row">
                 <!-- field for: from -->
                 {!! Form::label('date_from', 'Set time from:', ['class' => 'col-md-2 col-form-label']) !!}
                 <div class="col-md-2">
-                    <input type="date" name="date_from" step="1" min="2017-01-01" max="2030-12-31" value="<?= $selectedDateFrom ?>" class="form-control">
+                    <input type="date" name="date_from" step="1" min="2017-01-01" max="2030-12-31" value="<?= Request::get('date_from') ?>" class="form-control">
                 </div>
                 <!-- field for: to -->
                 {!! Form::label('date_to', 'To:', ['class' => 'col-md-1 col-form-label']) !!}
                 <div class="col-md-2">
-                    <input type="date" name="date_to" step="1" min="2017-01-01" max="2030-12-31" value="<?= $selectedDateTo ?>" class="form-control">
+                    <input type="date" name="date_to" step="1" min="2017-01-01" max="2030-12-31" value="<?= Request::get('date_to') ?>" class="form-control">
                 </div>
 
                 <div class="col-md-4">

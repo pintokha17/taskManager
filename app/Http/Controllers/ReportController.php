@@ -37,6 +37,7 @@ class ReportController extends Controller
                 ->get();
 
         } else { //searching all the records from table
+
             $tasks = DB::table('tasks')
                 ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
 				->where([

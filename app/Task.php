@@ -98,7 +98,7 @@ class Task extends Model
             return (new Duration($time))->humanize();
         }
 
-        $task = TaskTime::where(['user_id' => Auth::id(), 'task_id' => $task_id, 'is_active' => '1'])->first();
+        $task = TaskTime::where(['task_id' => $task_id, 'is_active' => '1'])->first();
 
         if ($task === null) {
             return (new Duration($time))->humanize();
@@ -117,7 +117,7 @@ class Task extends Model
 
         foreach ($tasks as $task) {
             if ($task->status === self::STATUS_STARTED) {
-                $task = TaskTime::where(['user_id' => Auth::id(), 'task_id' => $task->id, 'is_active' => '1'])->first();
+                $task = TaskTime::where(['task_id' => $task->id, 'is_active' => '1'])->first();
 
                 if ($task === null) {
                     continue;

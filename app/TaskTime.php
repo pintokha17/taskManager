@@ -17,18 +17,11 @@ class TaskTime extends Model
 {
     protected $table = 'task_time';
 
+    public $timestamps = false;
+
     public function task()
     {
         return $this->belongsTo('App\TaskTime');
-    }
-
-    public static function boot()
-    {
-        parent::boot();
-
-        self::updating(function($model){
-            $model->execution_time = $model->pause - $model->start;
-        });
     }
 
     /**
@@ -43,8 +36,7 @@ class TaskTime extends Model
     public function run($id)
     {
         $task = new TaskTime();
-        $task->start = date('U');
-        $task->pause = 0;
+        $task->start = new \DateTime();
         $task->is_active = 1;
         $task->task_id = $id;
         $task->save();
@@ -52,7 +44,7 @@ class TaskTime extends Model
 
     public function stop()
     {
-        $this->pause = date('U');
+        $this->pause = new \DateTime();
         $this->is_active = 0;
         $this->save();
     }

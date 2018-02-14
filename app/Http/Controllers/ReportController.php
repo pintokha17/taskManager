@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Task;
 use Illuminate\Http\Request;
-use App\TaskTime;
 use DB;
 use Auth;
 
@@ -15,39 +14,44 @@ class ReportController extends Controller
         //if the post method, we accept data from the form
         if ($request->isMethod('POST'))
         {
+            Task::fieldIsEmpty($request->get('date_from'), $request->get('date_to'));
+
             $dateFrom = new \DateTime($request->get('date_from'));
             $dateTo = new \DateTime($request->get('date_to'));
-            $dateTo->modify('+1 day');
 
-            if ($dateFrom->getTimestamp() > $dateTo->getTimestamp())
-            {
+            $dateTo->modify('+1 day');
+            //set datetime format
+            $dateFromFormatted = $dateFrom->format('Y-m-d H:i');
+            $dateToFormatted = $dateTo->format('Y-m-d H:i');
+
+            if ($dateFrom > $dateTo)
                 return redirect()->back()->with('error', 'incorrect input');
-            }
 
             //query for searching records from table Tasks and TaskTime
             $tasks = DB::table('tasks')
-                ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
+                ->select(DB::raw('tasks.*, SUM(timestampdiff(
+                          second,
+                          GREATEST(start, "'. $dateFromFormatted .'"),
+                          LEAST(pause, "'. $dateToFormatted .'"))) as total_time'))
                 ->where([
-                    ['task_time.start', '>=', $dateFrom->getTimestamp()],
-                    ['task_time.pause', '<=', $dateTo->getTimestamp()],
-					['tasks.user_id', '=', Auth::id()]
+                    ['tasks.user_id', '=', Auth::id()]
                 ])
-                ->leftJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
+                ->whereRaw("(GREATEST(start, '{$dateFromFormatted}') AND LEAST(pause, '{$dateToFormatted}')) OR pause IS NULL")
+                ->rightJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
                 ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
                 ->get();
 
         } else { //searching all the records from table
-
             $tasks = DB::table('tasks')
-                ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
+                ->select(DB::raw('tasks.*, sum(timestampdiff(second, task_time.start, task_time.pause)) as total_time'))
 				->where([
 					['tasks.user_id', '=', Auth::id()],
                 ])
-                ->leftJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
+                ->rightJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
                 ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
                 ->get();
-        }
 
+        }
         $totalTime = Task::getTotalTime($tasks);
 
         return view('report.index', [

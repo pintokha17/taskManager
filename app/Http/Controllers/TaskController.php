@@ -16,8 +16,8 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = DB::table('tasks')
-            ->select(DB::raw('tasks.*, sum(task_time.execution_time) as total_time'))
-			->where('tasks.user_id', '=', Auth::id())
+            ->select(DB::raw('tasks.*, sum(timestampdiff(second, task_time.start, task_time.pause)) as total_time'))
+            ->where('tasks.user_id', '=', Auth::id())
             ->leftJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
             ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
             ->get();

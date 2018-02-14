@@ -15,12 +15,10 @@ class CreateTaskTimeTable extends Migration
     {
         Schema::create('task_time', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('start');
-            $table->integer('pause');
-            $table->integer('execution_time')->default(0);
+            $table->dateTime('start');
+            $table->dateTime('pause')->nullable();
             $table->smallInteger('is_active');
             $table->integer('task_id');
-            $table->timestamps();
         });
     }
 

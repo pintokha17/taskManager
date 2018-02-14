@@ -105,7 +105,8 @@ class Task extends Model
         }
 
         // If we have an active task - calculate how much time did we spent
-        $activeSpentTime = (time()-$task->start);
+        $start = strtotime($task->start);
+        $activeSpentTime = (time()-$start);
         $time += $activeSpentTime;
 
         return (new Duration($time))->humanize();
@@ -116,19 +117,30 @@ class Task extends Model
         $totalTime = 0;
 
         foreach ($tasks as $task) {
+            $totalTime += $task->total_time;
             if ($task->status === self::STATUS_STARTED) {
                 $task = TaskTime::where(['task_id' => $task->id, 'is_active' => '1'])->first();
 
                 if ($task === null) {
                     continue;
                 }
-
-                $totalTime += (time()-$task->start);
-            } else {
-                $totalTime += $task->total_time;
+                $start = strtotime($task->start);
+                $totalTime += (time()-$start);
             }
         }
 
         return $totalTime;
+    }
+
+    public static function fieldIsEmpty($dateFrom, $dateTo)
+    {
+        if ($dateFrom === null | $dateTo === null)
+            return redirect()->back()->with('error', 'One of the fields is not specified!');
+    }
+
+    public static function isCorrectInput($dateFrom, $dateTo)
+    {
+        if ($dateFrom > $dateTo)
+            return redirect()->back()->with('error', 'incorrect input');
     }
 }

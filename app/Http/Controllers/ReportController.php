@@ -33,9 +33,7 @@ class ReportController extends Controller
                           second,
                           GREATEST(start, "'. $dateFromFormatted .'"),
                           LEAST(pause, "'. $dateToFormatted .'"))) as total_time'))
-                ->where([
-                    ['tasks.user_id', '=', Auth::id()]
-                ])
+                ->where('tasks.user_id', '=', Auth::id())
                 ->whereRaw("(GREATEST(start, '{$dateFromFormatted}') AND LEAST(pause, '{$dateToFormatted}')) OR pause IS NULL AND start <= '{$dateToFormatted}'")
                 ->rightJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
                 ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')

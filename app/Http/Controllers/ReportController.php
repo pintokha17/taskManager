@@ -14,8 +14,6 @@ class ReportController extends Controller
         //if the post method, we accept data from the form
         if ($request->isMethod('POST'))
         {
-            Task::fieldIsEmpty($request->get('date_from'), $request->get('date_to'));
-
             $dateFrom = new \DateTime($request->get('date_from'));
             $dateTo = new \DateTime($request->get('date_to'));
 
@@ -29,12 +27,9 @@ class ReportController extends Controller
 
             //query for searching records from table Tasks and TaskTime
             $tasks = DB::table('tasks')
-                ->select(DB::raw('tasks.*, SUM(timestampdiff(
-                          second,
-                          GREATEST(start, "'. $dateFromFormatted .'"),
-                          LEAST(pause, "'. $dateToFormatted .'"))) as total_time'))
+                ->select(DB::raw('tasks.*, SUM(timestampdiff(second, GREATEST(start, "'. $dateFromFormatted .'"), LEAST(pause, "'. $dateToFormatted .'"))) as total_time'))
                 ->where('tasks.user_id', '=', Auth::id())
-                ->whereRaw("(GREATEST(start, '{$dateFromFormatted}') AND LEAST(pause, '{$dateToFormatted}')) OR pause IS NULL AND start <= '{$dateToFormatted}'")
+                ->whereRaw("(GREATEST(start, '{$dateFromFormatted}') AND LEAST(pause, '{$dateToFormatted}')) OR pause IS NULL AND start <= '{$dateToFormatted}' AND pause >= '{$dateFromFormatted}'")
                 ->rightJoin('task_time', 'tasks.id', '=', 'task_time.task_id')
                 ->groupBy('tasks.id', 'tasks.name', 'tasks.description', 'tasks.status', 'user_id', 'created_at', 'updated_at')
                 ->get();
